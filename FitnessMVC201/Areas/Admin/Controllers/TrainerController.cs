@@ -1,13 +1,15 @@
 ﻿using System.Threading.Tasks;
 using FitnessMVC201.Contexts;
+using FitnessMVC201.Helpers;
 using FitnessMVC201.Models;
 using FitnessMVC201.ViewModels.TrainerViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Common;
 
-namespace FitnessMVC201.Areas.Admin.Controllers
-{
+namespace FitnessMVC201.Areas.Admin.Controllers;
+[Area("Admin")]
+
     public class TrainerController : Controller
     {
         private readonly AppDbContext _context;
@@ -16,15 +18,15 @@ namespace FitnessMVC201.Areas.Admin.Controllers
 
         public TrainerController(AppDbContext context, IWebHostEnvironment environment)
         {
-            context = _context;
-            environment = _environment;
-            folderPath = Path.Combine(_environment.WebRootPath, "images");
+            _context=context;
+            _environment= environment;
+        folderPath = Path.Combine(_environment.WebRootPath, "images");
         }
 
         public async Task<IActionResult> Index()
         {
 
-            var trainer = await _context.Trainers.Select(x => new TrainerGetVm()
+            var trainer = await _context.Trainers.Include(x=>x.Category).Select(x => new TrainerGetVm()
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -143,20 +145,58 @@ namespace FitnessMVC201.Areas.Admin.Controllers
         }
 
 
-       /* [HttpPost]
-        public async Task<IActionResult> Update(TrainerUpdateVm vm) {
+        [HttpPost]
+        public async Task<IActionResult> Update(TrainerUpdateVm vm)
+        {
 
 
             await SendCategoriesWithViewBag();
 
-            if(ModelState)
-        
-        }*/
+            if (!ModelState.IsValid) { return View(vm); }
+
+            var trainer = await _context.Trainers.FindAsync(vm.Id);
+            if (trainer == null) { return NotFound(); }
+            var isExistCategory = await _context.Categories.AnyAsync(x => x.Id == vm.CategoryId);
+            if (!isExistCategory)
+            {
+                ModelState.AddModelError("CategoryId", "This category not found");
+                return View(vm);
+            }
+
+            if (vm.ImageUrl?.CheckSize(2) ?? false)
+            {
+                ModelState.AddModelError("ImageUrl", "It must be max 2 mb");
+                return View(vm);
+            }
+            if (vm.ImageUrl?.CheckType("image") ?? false)
+            {
+                ModelState.AddModelError("ImageUrl", "It must be image type");
+                return View(vm);
+            }
+
+
+            trainer.Name = vm.Name;
+            trainer.Description = vm.Description;
+            trainer.CategoryId = vm.CategoryId;
+            trainer.Description = vm.Description;
+
+            if (vm.ImageUrl is { }) {
+                string newImagePath =await vm.ImageUrl.FileUploadAsync(folderPath);
+
+                string deletedImagePath = Path.Combine(folderPath,trainer.ImageUrl);
+
+                trainer.ImageUrl = newImagePath;
+            }
+            _context.Trainers.Update(trainer);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
 
         private async Task SendCategoriesWithViewBag()
         {
-            var categories = await _context.Trainers.ToListAsync();
+            var categories = await _context.Categories.ToListAsync();
             ViewBag.Categories = categories;
         }
     }
-}
+

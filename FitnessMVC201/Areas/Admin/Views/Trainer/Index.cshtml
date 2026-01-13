@@ -1,5 +1,40 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@using FitnessMVC201.ViewModels.TrainerViewModels
+@model List<TrainerGetVm>
+
+<div class="container">
+	<div>
+		<a asp-area="Admin" asp-controller="Trainer" asp-action="Create" class="btn btn-success">Create</a>
+	</div>
+	<div class="row">
+		<table class="table">
+			<thead>
+				<tr>
+					<th scope="col">Id</th>
+					<th scope="col">Name</th>
+					<th scope="col">Description</th>
+					<th scope="col">CategoryName</th>
+					<th scope="col">ImagePath</th>
+					<th scope="col">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var trainer in Model)
+				{
+					<tr>
+						<th scope="row">@trainer.Id</th>
+						<td>@trainer.Name</td>
+						<td>@trainer.Description</td>
+						<td>@trainer.CategoryName</td>
+						<td><img src="~/images/@trainer.ImageUrl" /></td>
+						<td>
+							<a asp-area="Admin" asp-controller="Trainer" asp-action="Update" asp-route-id="@trainer.Id" class="btn btn-warning">Update</a>
+							<a asp-area="Admin" asp-controller="Trainer" asp-action="Delete" asp-route-id="@trainer.Id" class="btn btn-danger">Delete</a>
+						</td>
+					</tr>
+				}
+
+			</tbody>
+		</table>
+
+	</div>
+</div>

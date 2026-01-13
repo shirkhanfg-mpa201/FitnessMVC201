@@ -1,0 +1,29 @@
+﻿@using FitnessMVC201.Models
+@using FitnessMVC201.ViewModels.CategoryViewModels
+@model List<CategoryGetVM>
+<div class="d-flex flex-column m-4 w-100">
+    <a asp-action="Create" asp-controller="Category" asp-area="Admin" class="btn btn-warning">Create New Category</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Name</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var category in Model)
+            {
+                <tr>
+                    <th scope="row">@category.Id</th>
+                    <td>@category.Name</td>
+                    <td>
+                        <a asp-action="Update" asp-controller="Category" asp-area="Admin" asp-route-id="@category.Id" class="btn btn-primary">Update</a>
+                        <a asp-action="Delete" asp-controller="Category" asp-area="Admin" asp-route-id="@category.Id" class="btn btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</div>

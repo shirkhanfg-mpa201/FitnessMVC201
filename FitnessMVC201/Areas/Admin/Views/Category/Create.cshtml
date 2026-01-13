@@ -1,0 +1,23 @@
+﻿@using FitnessMVC201.Models
+@using FitnessMVC201.ViewModels.CategoryViewModels
+@model CategoryCreateVM
+<form asp-action="Create"
+      asp-controller="Category"
+      asp-area="Admin"
+      method="post">
+
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mt-3">
+        <a asp-action="Index"
+           asp-controller="Category"
+           asp-area="Admin"
+           class="btn btn-danger">Cancel</a>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</form>

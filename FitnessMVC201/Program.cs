@@ -1,3 +1,6 @@
+using FitnessMVC201.Contexts;
+using Microsoft.EntityFrameworkCore;
+
 namespace FitnessMVC201
 {
     public class Program
@@ -8,6 +11,11 @@ namespace FitnessMVC201
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddDbContext<AppDbContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
+            });
 
             var app = builder.Build();
 
